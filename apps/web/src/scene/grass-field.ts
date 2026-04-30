@@ -4,7 +4,7 @@ import { createGrassBladeMaterial } from './grass-blade-material';
 import type { GrassPalette } from './grass-palette';
 
 const FIELD_HALF = 20;
-const GRID_STEP = 0.18;
+const GRID_STEP = 0.22;
 const SCALE_MIN = 0.7;
 const SCALE_MAX = 1.4;
 const TILT_RANGE = 0.18;
