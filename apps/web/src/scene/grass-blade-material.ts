@@ -15,6 +15,7 @@ attribute vec4 world2;
 attribute vec4 world3;
 
 uniform mat4 viewProjection;
+uniform float time;
 
 varying vec2 vUv;
 varying vec3 vNormalW;
@@ -23,6 +24,13 @@ varying vec3 vWorldPos;
 void main(void) {
   mat4 finalWorld = mat4(world0, world1, world2, world3);
   vec4 worldPos = finalWorld * vec4(position, 1.0);
+
+  float windInfluence = uv.y * uv.y;
+  float phase = worldPos.x * 0.45 + worldPos.z * 0.35;
+  float wave = sin(time * 1.1 + phase) * 0.7 + sin(time * 2.3 + phase * 1.7) * 0.3;
+  worldPos.x += wave * 0.09 * windInfluence;
+  worldPos.z += wave * 0.05 * windInfluence;
+
   gl_Position = viewProjection * worldPos;
   vWorldPos = worldPos.xyz;
   vUv = uv;
@@ -95,6 +103,7 @@ export function createGrassBladeMaterial(
         'tipColor',
         'lightDir',
         'lightColor',
+        'time',
       ],
     },
   );
@@ -114,10 +123,19 @@ export function createGrassBladeMaterial(
   setPalette(palette);
   setLightDirection(lightDirection);
 
+  const startedAt = performance.now();
+  material.setFloat('time', 0);
+  const tickObserver = scene.onBeforeRenderObservable.add(() => {
+    material.setFloat('time', (performance.now() - startedAt) * 0.001);
+  });
+
   return {
     material,
     setPalette,
     setLightDirection,
-    dispose: () => material.dispose(true, true),
+    dispose: () => {
+      if (tickObserver) scene.onBeforeRenderObservable.remove(tickObserver);
+      material.dispose(true, true);
+    },
   };
 }
