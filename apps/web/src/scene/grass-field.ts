@@ -33,7 +33,7 @@ export function createGrassField(
   const bladeMaterial = createGrassBladeMaterial(scene, palette, lightDirection);
   blade.material = bladeMaterial.material;
 
-  const rand = seededRandom(0xc1ty4ura);
+  const rand = seededRandom(0xa17a);
   const matrices: number[] = [];
   let count = 0;
 

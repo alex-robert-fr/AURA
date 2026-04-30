@@ -2,48 +2,62 @@ import {
   ArcRotateCamera,
   Color3,
   Color4,
+  DirectionalLight,
   Engine,
   HemisphericLight,
   MeshBuilder,
   Scene,
   Vector3,
 } from '@babylonjs/core';
-import { type Era, useCityStore } from '../store/city-store';
+import { useCityStore } from '../store/city-store';
+import { createDirtGround } from './dirt-ground';
+import { animatePaletteTo } from './grass-era-transition';
+import { createGrassField } from './grass-field';
+import { type GrassPalette, eraGrassPalette } from './grass-palette';
+import { createGrassPipeline } from './grass-postprocess';
 
-const eraClearColor: Record<Era, Color4> = {
-  genesis: new Color4(0.08, 0.09, 0.12, 1),
-  industria: new Color4(0.04, 0.05, 0.08, 1),
-  singularity: new Color4(0.05, 0.02, 0.08, 1),
-};
+const ERA_TRANSITION_MS = 2000;
+const SUN_DIRECTION = new Vector3(-0.4, -1, -0.3);
 
 export function createCityScene(canvas: HTMLCanvasElement): () => void {
   const engine = new Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
   const scene = new Scene(engine);
-  scene.clearColor = eraClearColor[useCityStore.getState().era];
+
+  const initialPalette = eraGrassPalette[useCityStore.getState().era];
+  scene.clearColor = initialPalette.sky.clone();
 
   const camera = new ArcRotateCamera(
     'camera',
     -Math.PI / 4,
-    Math.PI / 3.2,
-    24,
-    Vector3.Zero(),
+    Math.PI / 2.4,
+    14,
+    new Vector3(0, 0.6, 0),
     scene,
   );
   camera.attachControl(canvas, true);
-  camera.lowerRadiusLimit = 8;
-  camera.upperRadiusLimit = 80;
-  camera.lowerBetaLimit = 0.2;
-  camera.upperBetaLimit = Math.PI / 2.2;
+  camera.lowerRadiusLimit = 4;
+  camera.upperRadiusLimit = 40;
+  camera.lowerBetaLimit = 0.6;
+  camera.upperBetaLimit = Math.PI / 2.15;
+  camera.minZ = 0.1;
 
-  const light = new HemisphericLight('light', new Vector3(0.4, 1, 0.2), scene);
-  light.intensity = 0.85;
-  light.groundColor = new Color3(0.15, 0.18, 0.25);
+  const sun = new DirectionalLight('sun', SUN_DIRECTION.normalizeToNew(), scene);
+  sun.intensity = 1;
+  sun.diffuse = initialPalette.sun.clone();
+  sun.specular = new Color3(0, 0, 0);
 
-  const ground = MeshBuilder.CreateGround('ground', { width: 40, height: 40 }, scene);
-  ground.position.y = 0;
+  const ambient = new HemisphericLight('ambient', new Vector3(0, 1, 0), scene);
+  ambient.intensity = 0.35;
+  ambient.diffuse = new Color3(0.7, 0.78, 0.85);
+  ambient.groundColor = new Color3(0.2, 0.22, 0.2);
+
+  const dirtGround = createDirtGround(scene, initialPalette);
+  const grassField = createGrassField(scene, initialPalette, SUN_DIRECTION);
 
   const placeholder = MeshBuilder.CreateBox('genesis-monument', { size: 1.5 }, scene);
   placeholder.position.y = 0.75;
+
+  const pipeline = createGrassPipeline(scene, camera);
 
   engine.renderEvenInBackground = false;
 
@@ -62,10 +76,28 @@ export function createCityScene(canvas: HTMLCanvasElement): () => void {
   const onResize = () => engine.resize();
   window.addEventListener('resize', onResize);
 
+  let currentPalette: GrassPalette = initialPalette;
+  let cancelEraTransition: (() => void) | null = null;
+
+  const applyPalette = (p: GrassPalette): void => {
+    currentPalette = p;
+    grassField.setPalette(p);
+    dirtGround.setPalette(p);
+    sun.diffuse = p.sun.clone();
+    scene.clearColor = new Color4(p.sky.r, p.sky.g, p.sky.b, p.sky.a);
+  };
+
   const unsubscribeStore = useCityStore.subscribe((state, prev) => {
-    if (state.era !== prev.era) {
-      scene.clearColor = eraClearColor[state.era];
-    }
+    if (state.era === prev.era) return;
+    cancelEraTransition?.();
+    const result = animatePaletteTo(
+      scene,
+      currentPalette,
+      eraGrassPalette[state.era],
+      ERA_TRANSITION_MS,
+      { apply: applyPalette },
+    );
+    cancelEraTransition = result.cancel;
   });
 
   let disposed = false;
@@ -73,9 +105,16 @@ export function createCityScene(canvas: HTMLCanvasElement): () => void {
     if (disposed) return;
     disposed = true;
     stopRender();
+    cancelEraTransition?.();
     unsubscribeStore();
     document.removeEventListener('visibilitychange', onVisibilityChange);
     window.removeEventListener('resize', onResize);
+    pipeline.dispose();
+    grassField.dispose();
+    dirtGround.dispose();
+    placeholder.dispose();
+    sun.dispose();
+    ambient.dispose();
     scene.dispose();
     engine.dispose();
   };
