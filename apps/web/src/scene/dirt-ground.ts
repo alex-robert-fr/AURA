@@ -1,0 +1,29 @@
+import { Color3, type Mesh, MeshBuilder, type Scene, StandardMaterial } from '@babylonjs/core';
+import type { GrassPalette } from './grass-palette';
+
+export interface DirtGround {
+  mesh: Mesh;
+  setPalette: (palette: GrassPalette) => void;
+  dispose: () => void;
+}
+
+export function createDirtGround(scene: Scene, palette: GrassPalette): DirtGround {
+  const mesh = MeshBuilder.CreateGround('dirt-ground', { width: 200, height: 200 }, scene);
+  mesh.position.y = -0.001;
+
+  const material = new StandardMaterial('dirt-material', scene);
+  material.diffuseColor = palette.ground.clone();
+  material.specularColor = new Color3(0, 0, 0);
+  mesh.material = material;
+
+  return {
+    mesh,
+    setPalette: (p) => {
+      material.diffuseColor = p.ground.clone();
+    },
+    dispose: () => {
+      material.dispose();
+      mesh.dispose();
+    },
+  };
+}
