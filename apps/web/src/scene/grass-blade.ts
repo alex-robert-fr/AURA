@@ -6,7 +6,7 @@ const TIP_WIDTH = 0.01;
 const HEIGHT = 0.65;
 const CURVE = 0.13;
 
-const BLADES_PER_CLUMP = 5;
+const BLADES_PER_CLUMP = 7;
 const CLUMP_SPREAD = 0.07;
 const CLUMP_SCALE_MIN = 0.7;
 const CLUMP_SCALE_MAX = 1.25;
@@ -52,23 +52,18 @@ function pushBlade(
 
     pushVertex(-w / 2 + xOffset, 0);
     pushVertex(w / 2 + xOffset, 0);
-    pushVertex(xOffset, -w / 2);
-    pushVertex(xOffset, w / 2);
 
-    uvs.push(0, t, 1, t, 0, t, 1, t);
+    uvs.push(0, t, 1, t);
 
-    const nAx = -sinY;
-    const nAz = cosY;
-    const nBx = cosY;
-    const nBz = sinY;
-    normals.push(nAx, 0, nAz, nAx, 0, nAz, nBx, 0, nBz, nBx, 0, nBz);
+    const nx = -sinY;
+    const nz = cosY;
+    normals.push(nx, 0, nz, nx, 0, nz);
   }
 
   for (let i = 0; i < SEGMENTS; i++) {
-    const a = startIndex + i * 4;
-    const b = startIndex + (i + 1) * 4;
+    const a = startIndex + i * 2;
+    const b = startIndex + (i + 1) * 2;
     indices.push(a, a + 1, b + 1, a, b + 1, b);
-    indices.push(a + 2, a + 3, b + 3, a + 2, b + 3, b + 2);
   }
 }
 
