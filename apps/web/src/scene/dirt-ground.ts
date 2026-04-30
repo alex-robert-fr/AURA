@@ -8,7 +8,7 @@ export interface DirtGround {
 }
 
 export function createDirtGround(scene: Scene, palette: GrassPalette): DirtGround {
-  const mesh = MeshBuilder.CreateGround('dirt-ground', { width: 200, height: 200 }, scene);
+  const mesh = MeshBuilder.CreateGround('dirt-ground', { width: 40, height: 40 }, scene);
   mesh.position.y = -0.001;
 
   const material = new StandardMaterial('dirt-material', scene);
