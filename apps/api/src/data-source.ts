@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { env } from './config/env.js';
 
@@ -11,7 +10,10 @@ export const AppDataSource = new DataSource({
   database: env.DATABASE_NAME,
   synchronize: env.NODE_ENV === 'development',
   logging: env.NODE_ENV === 'development',
-  entities: ['src/modules/**/*.entity.ts'],
-  migrations: ['src/migrations/*.ts'],
+  entities:
+    env.NODE_ENV === 'production'
+      ? ['dist/modules/**/*.entity.js']
+      : ['src/modules/**/*.entity.ts'],
+  migrations: env.NODE_ENV === 'production' ? ['dist/migrations/*.js'] : ['src/migrations/*.ts'],
   subscribers: [],
 });
