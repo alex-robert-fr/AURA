@@ -48,14 +48,14 @@ void main(void) {
 
   float h = smoothstep(0.0, 1.0, vUv.y);
   vec3 grad = mix(baseColor, tipColor, h);
-  grad *= mix(0.5, 1.0, smoothstep(0.0, 0.2, vUv.y));
+  grad *= mix(0.78, 1.0, smoothstep(0.0, 0.25, vUv.y));
 
   vec3 n = normalize(vNormalW);
   float ndl = clamp(dot(n, nLight), 0.0, 1.0);
-  vec3 diffuse = grad * lightColor * (0.55 + 0.45 * ndl);
+  vec3 diffuse = grad * lightColor * (0.7 + 0.3 * ndl);
 
-  float backlit = pow(clamp(dot(-nLight, viewDir), 0.0, 1.0), 3.0);
-  diffuse += tipColor * lightColor * backlit * 0.55 * h;
+  float backlit = pow(clamp(dot(-nLight, viewDir), 0.0, 1.0), 2.5);
+  diffuse += tipColor * lightColor * backlit * 0.65 * h;
 
   gl_FragColor = vec4(diffuse, 1.0);
 }

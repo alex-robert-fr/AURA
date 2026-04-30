@@ -1,12 +1,10 @@
 import { Matrix, Quaternion, type Scene, Vector3 } from '@babylonjs/core';
-import { createGrassBlade } from './grass-blade';
+import { createGrassClump } from './grass-blade';
 import { createGrassBladeMaterial } from './grass-blade-material';
 import type { GrassPalette } from './grass-palette';
 
-const FIELD_RADIUS = 30;
-const GRID_STEP = 0.3;
-const FADE_INNER = 22;
-const FADE_OUTER = 30;
+const FIELD_HALF = 20;
+const GRID_STEP = 0.18;
 const SCALE_MIN = 0.7;
 const SCALE_MAX = 1.4;
 const TILT_RANGE = 0.18;
@@ -29,24 +27,16 @@ export function createGrassField(
   palette: GrassPalette,
   lightDirection: Vector3,
 ): GrassField {
-  const blade = createGrassBlade(scene);
-  const bladeMaterial = createGrassBladeMaterial(scene, palette, lightDirection);
-  blade.material = bladeMaterial.material;
+  const clump = createGrassClump(scene);
+  const clumpMaterial = createGrassBladeMaterial(scene, palette, lightDirection);
+  clump.material = clumpMaterial.material;
 
-  const rand = seededRandom(0xa17a);
+  const rand = seededRandom(0xb27c);
   const matrices: number[] = [];
   let count = 0;
 
-  const half = FIELD_RADIUS;
-  for (let x = -half; x <= half; x += GRID_STEP) {
-    for (let z = -half; z <= half; z += GRID_STEP) {
-      const dist = Math.sqrt(x * x + z * z);
-      if (dist > FADE_OUTER) continue;
-      if (dist > FADE_INNER) {
-        const keep = 1 - (dist - FADE_INNER) / (FADE_OUTER - FADE_INNER);
-        if (rand() > keep) continue;
-      }
-
+  for (let x = -FIELD_HALF; x <= FIELD_HALF; x += GRID_STEP) {
+    for (let z = -FIELD_HALF; z <= FIELD_HALF; z += GRID_STEP) {
       const jitterX = (rand() - 0.5) * GRID_STEP * 0.95;
       const jitterZ = (rand() - 0.5) * GRID_STEP * 0.95;
       const px = x + jitterX;
@@ -69,14 +59,14 @@ export function createGrassField(
   }
 
   const buffer = new Float32Array(matrices);
-  blade.thinInstanceSetBuffer('matrix', buffer, 16, true);
+  clump.thinInstanceSetBuffer('matrix', buffer, 16, true);
 
   return {
-    setPalette: (p) => bladeMaterial.setPalette(p),
+    setPalette: (p) => clumpMaterial.setPalette(p),
     dispose: () => {
-      blade.thinInstanceCount = 0;
-      bladeMaterial.dispose();
-      blade.dispose();
+      clump.thinInstanceCount = 0;
+      clumpMaterial.dispose();
+      clump.dispose();
     },
   };
 }
