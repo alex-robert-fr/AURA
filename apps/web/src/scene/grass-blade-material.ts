@@ -20,6 +20,7 @@ uniform float time;
 varying vec2 vUv;
 varying vec3 vNormalW;
 varying vec3 vWorldPos;
+varying float vWindTilt;
 
 void main(void) {
   mat4 finalWorld = mat4(world0, world1, world2, world3);
@@ -35,6 +36,7 @@ void main(void) {
   vWorldPos = worldPos.xyz;
   vUv = uv;
   vNormalW = normalize((finalWorld * vec4(normal, 0.0)).xyz);
+  vWindTilt = wave * windInfluence;
 }
 `;
 
@@ -43,6 +45,7 @@ precision highp float;
 varying vec2 vUv;
 varying vec3 vNormalW;
 varying vec3 vWorldPos;
+varying float vWindTilt;
 
 uniform vec3 baseColor;
 uniform vec3 tipColor;
@@ -58,12 +61,17 @@ void main(void) {
   vec3 grad = mix(baseColor, tipColor, h);
   grad *= mix(0.78, 1.0, smoothstep(0.0, 0.25, vUv.y));
 
-  vec3 n = normalize(vNormalW);
+  vec3 n = normalize(vNormalW + vec3(vWindTilt * 1.6, 0.0, vWindTilt * 0.8));
   float ndl = clamp(dot(n, nLight), 0.0, 1.0);
   vec3 diffuse = grad * lightColor * (0.7 + 0.3 * ndl);
 
   float backlit = pow(clamp(dot(-nLight, viewDir), 0.0, 1.0), 2.5);
   diffuse += tipColor * lightColor * backlit * 0.65 * h;
+
+  vec3 halfDir = normalize(viewDir + nLight);
+  float spec = pow(clamp(dot(n, halfDir), 0.0, 1.0), 28.0);
+  float specMask = smoothstep(0.35, 1.0, vUv.y);
+  diffuse += lightColor * spec * specMask * 0.85;
 
   gl_FragColor = vec4(diffuse, 1.0);
 }
