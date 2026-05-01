@@ -4,7 +4,6 @@ import {
   DirectionalLight,
   Engine,
   HemisphericLight,
-  MeshBuilder,
   Scene,
   Vector3,
 } from '@babylonjs/core';
@@ -13,7 +12,9 @@ import { attachFpsCounter } from './fps-counter';
 import { createGrassField } from './grass-field';
 import { defaultGrassPalette } from './grass-palette';
 import { createGrassPipeline } from './grass-postprocess';
+import { createGridState } from './grid';
 import { createGridOverlay } from './grid-overlay';
+import { createGridPlacement } from './grid-placement';
 
 const SUN_DIRECTION = new Vector3(-0.4, -1, -0.3);
 
@@ -50,10 +51,9 @@ export function createCityScene(canvas: HTMLCanvasElement): () => void {
 
   const dirtGround = createDirtGround(scene, defaultGrassPalette);
   const grassField = createGrassField(scene, defaultGrassPalette, SUN_DIRECTION);
-  const gridOverlay = createGridOverlay(scene, dirtGround.mesh);
-
-  const placeholder = MeshBuilder.CreateBox('genesis-monument', { size: 1.5 }, scene);
-  placeholder.position.y = 0.75;
+  const gridState = createGridState();
+  const gridOverlay = createGridOverlay(scene, dirtGround.mesh, gridState);
+  const gridPlacement = createGridPlacement(scene, dirtGround.mesh, gridState);
 
   const pipeline = createGrassPipeline(scene, camera);
 
@@ -85,10 +85,10 @@ export function createCityScene(canvas: HTMLCanvasElement): () => void {
     window.removeEventListener('resize', onResize);
     detachFpsCounter();
     pipeline.dispose();
+    gridPlacement.dispose();
     gridOverlay.dispose();
     grassField.dispose();
     dirtGround.dispose();
-    placeholder.dispose();
     sun.dispose();
     ambient.dispose();
     scene.dispose();
