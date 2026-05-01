@@ -2,7 +2,6 @@ import { Effect, type Scene, ShaderMaterial, type Vector3 } from '@babylonjs/cor
 import type { GrassPalette } from './grass-palette';
 
 const SHADER_NAME = 'auraGrassBlade';
-let registered = false;
 
 const vertexShader = `
 precision highp float;
@@ -78,10 +77,9 @@ void main(void) {
 `;
 
 function registerShaders(): void {
-  if (registered) return;
+  if (Effect.ShadersStore[`${SHADER_NAME}VertexShader`]) return;
   Effect.ShadersStore[`${SHADER_NAME}VertexShader`] = vertexShader;
   Effect.ShadersStore[`${SHADER_NAME}FragmentShader`] = fragmentShader;
-  registered = true;
 }
 
 export interface GrassBladeMaterial {
