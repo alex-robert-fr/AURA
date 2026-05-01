@@ -13,9 +13,7 @@ import {
   CELL_SIZE,
   GRID_HALF_EXTENT,
   type GridCell,
-  type GridState,
   cellToWorld,
-  createGridState,
   isCellInBounds,
   worldToCell,
 } from './grid';
@@ -28,13 +26,10 @@ const HIGHLIGHT_COLOR = new Color3(0.95, 0.97, 1);
 const HIGHLIGHT_ALPHA = 0.4;
 
 export interface GridOverlay {
-  state: GridState;
   dispose: () => void;
 }
 
 export function createGridOverlay(scene: Scene, ground: Mesh): GridOverlay {
-  const state = createGridState();
-
   const lines: Vector3[][] = [];
   for (let i = -GRID_HALF_EXTENT; i <= GRID_HALF_EXTENT; i += CELL_SIZE) {
     lines.push([
@@ -82,7 +77,7 @@ export function createGridOverlay(scene: Scene, ground: Mesh): GridOverlay {
 
   const handlePointer = (info: PointerInfo) => {
     if (info.type === PointerEventTypes.POINTERMOVE) {
-      const pick = scene.pick(scene.pointerX, scene.pointerY, (mesh) => mesh === ground);
+      const pick = scene.pick(scene.pointerX, scene.pointerY, (mesh) => mesh === ground, true);
       if (!pick?.hit || !pick.pickedPoint) {
         setVisibility(false);
         return;
@@ -105,7 +100,6 @@ export function createGridOverlay(scene: Scene, ground: Mesh): GridOverlay {
   canvas?.addEventListener('pointerleave', handleLeave);
 
   return {
-    state,
     dispose: () => {
       if (observer) scene.onPointerObservable.remove(observer);
       canvas?.removeEventListener('pointerleave', handleLeave);

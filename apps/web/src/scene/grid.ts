@@ -2,7 +2,6 @@ import { Vector3 } from '@babylonjs/core';
 
 export const CELL_SIZE = 1;
 export const GRID_HALF_EXTENT = 20;
-export const GRID_CELLS_PER_SIDE = (GRID_HALF_EXTENT * 2) / CELL_SIZE;
 
 export interface GridCell {
   x: number;
