@@ -11,6 +11,7 @@ import {
 } from '@babylonjs/core';
 import { useCityStore } from '../store/city-store';
 import { createDirtGround } from './dirt-ground';
+import { attachFpsCounter } from './fps-counter';
 import { animatePaletteTo } from './grass-era-transition';
 import { createGrassField } from './grass-field';
 import { type GrassPalette, eraGrassPalette } from './grass-palette';
@@ -61,6 +62,8 @@ export function createCityScene(canvas: HTMLCanvasElement): () => void {
 
   engine.renderEvenInBackground = false;
 
+  const detachFpsCounter = attachFpsCounter(scene, engine);
+
   const renderTick = () => scene.render();
   const startRender = () => engine.runRenderLoop(renderTick);
   const stopRender = () => engine.stopRenderLoop();
@@ -109,6 +112,7 @@ export function createCityScene(canvas: HTMLCanvasElement): () => void {
     unsubscribeStore();
     document.removeEventListener('visibilitychange', onVisibilityChange);
     window.removeEventListener('resize', onResize);
+    detachFpsCounter();
     pipeline.dispose();
     grassField.dispose();
     dirtGround.dispose();
