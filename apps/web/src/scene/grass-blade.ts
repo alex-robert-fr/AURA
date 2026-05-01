@@ -52,18 +52,21 @@ function pushBlade(
 
     pushVertex(-w / 2 + xOffset, 0);
     pushVertex(w / 2 + xOffset, 0);
+    pushVertex(-w / 2 + xOffset, 0);
+    pushVertex(w / 2 + xOffset, 0);
 
-    uvs.push(0, t, 1, t);
+    uvs.push(0, t, 1, t, 0, t, 1, t);
 
     const nx = -sinY;
     const nz = cosY;
-    normals.push(nx, 0, nz, nx, 0, nz);
+    normals.push(nx, 0, nz, nx, 0, nz, -nx, 0, -nz, -nx, 0, -nz);
   }
 
   for (let i = 0; i < SEGMENTS; i++) {
-    const a = startIndex + i * 2;
-    const b = startIndex + (i + 1) * 2;
+    const a = startIndex + i * 4;
+    const b = startIndex + (i + 1) * 4;
     indices.push(a, a + 1, b + 1, a, b + 1, b);
+    indices.push(a + 2, b + 3, a + 3, a + 2, b + 2, b + 3);
   }
 }
 

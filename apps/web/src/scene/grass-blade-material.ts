@@ -116,7 +116,7 @@ export function createGrassBladeMaterial(
     },
   );
 
-  material.backFaceCulling = false;
+  material.backFaceCulling = true;
 
   const setPalette = (p: GrassPalette): void => {
     material.setColor3('baseColor', p.base);
