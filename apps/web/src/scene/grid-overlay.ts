@@ -1,5 +1,6 @@
 import {
   Color3,
+  Constants,
   type Mesh,
   MeshBuilder,
   type Observer,
@@ -47,7 +48,10 @@ export function createGridOverlay(scene: Scene, ground: Mesh): GridOverlay {
   gridMesh.alpha = GRID_ALPHA;
   gridMesh.isPickable = false;
   gridMesh.isVisible = false;
-  gridMesh.renderingGroupId = 1;
+  if (gridMesh.material) {
+    gridMesh.material.disableDepthWrite = true;
+    gridMesh.material.depthFunction = Constants.ALWAYS;
+  }
 
   const highlightMesh = MeshBuilder.CreatePlane(
     'grid-highlight',
@@ -57,7 +61,6 @@ export function createGridOverlay(scene: Scene, ground: Mesh): GridOverlay {
   highlightMesh.rotation.x = Math.PI / 2;
   highlightMesh.isPickable = false;
   highlightMesh.isVisible = false;
-  highlightMesh.renderingGroupId = 1;
 
   const highlightMaterial = new StandardMaterial('grid-highlight-material', scene);
   highlightMaterial.diffuseColor = HIGHLIGHT_COLOR;
@@ -65,6 +68,8 @@ export function createGridOverlay(scene: Scene, ground: Mesh): GridOverlay {
   highlightMaterial.specularColor = new Color3(0, 0, 0);
   highlightMaterial.alpha = HIGHLIGHT_ALPHA;
   highlightMaterial.disableLighting = true;
+  highlightMaterial.disableDepthWrite = true;
+  highlightMaterial.depthFunction = Constants.ALWAYS;
   highlightMesh.material = highlightMaterial;
 
   const cellBuffer: GridCell = { x: 0, z: 0 };
