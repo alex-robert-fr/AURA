@@ -9,12 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Remplace le sol plat par un champ d'herbe 3D dense couvrant tout le plateau : ~350 000 brins individuels animés par une brise avec brillance spéculaire sur les pointes et profondeur de champ légère en arrière-plan ([`8faed6b`](https://github.com/alex-robert-fr/AURA/commit/8faed6b))
-- Ajoute un overlay de débogage affichant le nombre d'images par seconde et le temps de rendu lissé en millisecondes ([`6f1d1d7`](https://github.com/alex-robert-fr/AURA/commit/6f1d1d7))
+- Remplace le sol plat par un champ d'herbe 3D dense couvrant tout le plateau : ~350 000 brins individuels animés par une brise avec brillance spéculaire sur les pointes et profondeur de champ légère en arrière-plan ([#2](https://github.com/alex-robert-fr/AURA/pull/2))
+- Ajoute un overlay de débogage affichant le nombre d'images par seconde et le temps de rendu lissé en millisecondes ([#2](https://github.com/alex-robert-fr/AURA/pull/2))
 
 ### Changed
 
-- Adopte une caméra plus rasante (angle abaissé, zoom limité entre 4 et 40 unités) pour mettre les brins d'herbe en valeur ([`8faed6b`](https://github.com/alex-robert-fr/AURA/commit/8faed6b))
+- Adopte une caméra plus rasante (angle abaissé, zoom limité entre 4 et 40 unités) pour mettre les brins d'herbe en valeur ([#2](https://github.com/alex-robert-fr/AURA/pull/2))
 
 ## [0.0.1] - 2026-04-30
 
