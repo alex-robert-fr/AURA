@@ -14,23 +14,24 @@ import {
   CELL_SIZE,
   GRID_HALF_EXTENT,
   type GridCell,
+  type GridState,
   cellToWorld,
   isCellInBounds,
   worldToCell,
 } from './grid';
+import { GRID_HIGHLIGHT_FREE, GRID_HIGHLIGHT_OCCUPIED } from './grid-colors';
 
 const GRID_Y = 0.002;
 const HIGHLIGHT_Y = 0.003;
 const GRID_COLOR = new Color3(0.85, 0.88, 0.95);
 const GRID_ALPHA = 0.35;
-const HIGHLIGHT_COLOR = new Color3(0.95, 0.97, 1);
 const HIGHLIGHT_ALPHA = 0.4;
 
 export interface GridOverlay {
   dispose: () => void;
 }
 
-export function createGridOverlay(scene: Scene, ground: Mesh): GridOverlay {
+export function createGridOverlay(scene: Scene, ground: Mesh, gridState: GridState): GridOverlay {
   const lines: Vector3[][] = [];
   for (let i = -GRID_HALF_EXTENT; i <= GRID_HALF_EXTENT; i += CELL_SIZE) {
     lines.push([
@@ -63,8 +64,8 @@ export function createGridOverlay(scene: Scene, ground: Mesh): GridOverlay {
   highlightMesh.isVisible = false;
 
   const highlightMaterial = new StandardMaterial('grid-highlight-material', scene);
-  highlightMaterial.diffuseColor = HIGHLIGHT_COLOR;
-  highlightMaterial.emissiveColor = HIGHLIGHT_COLOR;
+  highlightMaterial.diffuseColor.copyFrom(GRID_HIGHLIGHT_FREE);
+  highlightMaterial.emissiveColor.copyFrom(GRID_HIGHLIGHT_FREE);
   highlightMaterial.specularColor = new Color3(0, 0, 0);
   highlightMaterial.alpha = HIGHLIGHT_ALPHA;
   highlightMaterial.disableLighting = true;
@@ -74,10 +75,19 @@ export function createGridOverlay(scene: Scene, ground: Mesh): GridOverlay {
 
   const cellBuffer: GridCell = { x: 0, z: 0 };
   const positionBuffer = new Vector3();
+  let currentOccupied = false;
 
   const setVisibility = (visible: boolean) => {
     if (gridMesh.isVisible !== visible) gridMesh.isVisible = visible;
     if (highlightMesh.isVisible !== visible) highlightMesh.isVisible = visible;
+  };
+
+  const setOccupiedState = (occupied: boolean) => {
+    if (occupied === currentOccupied) return;
+    currentOccupied = occupied;
+    const color = occupied ? GRID_HIGHLIGHT_OCCUPIED : GRID_HIGHLIGHT_FREE;
+    highlightMaterial.diffuseColor.copyFrom(color);
+    highlightMaterial.emissiveColor.copyFrom(color);
   };
 
   const handlePointer = (info: PointerInfo) => {
@@ -94,6 +104,7 @@ export function createGridOverlay(scene: Scene, ground: Mesh): GridOverlay {
       }
       cellToWorld(cellBuffer, positionBuffer);
       highlightMesh.position.set(positionBuffer.x, HIGHLIGHT_Y, positionBuffer.z);
+      setOccupiedState(gridState.isOccupied(cellBuffer));
       setVisibility(true);
     }
   };
