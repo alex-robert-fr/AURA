@@ -64,8 +64,8 @@ export function createGridOverlay(scene: Scene, ground: Mesh, gridState: GridSta
   highlightMesh.isVisible = false;
 
   const highlightMaterial = new StandardMaterial('grid-highlight-material', scene);
-  highlightMaterial.diffuseColor = GRID_HIGHLIGHT_FREE;
-  highlightMaterial.emissiveColor = GRID_HIGHLIGHT_FREE;
+  highlightMaterial.diffuseColor.copyFrom(GRID_HIGHLIGHT_FREE);
+  highlightMaterial.emissiveColor.copyFrom(GRID_HIGHLIGHT_FREE);
   highlightMaterial.specularColor = new Color3(0, 0, 0);
   highlightMaterial.alpha = HIGHLIGHT_ALPHA;
   highlightMaterial.disableLighting = true;
@@ -86,8 +86,8 @@ export function createGridOverlay(scene: Scene, ground: Mesh, gridState: GridSta
     if (occupied === currentOccupied) return;
     currentOccupied = occupied;
     const color = occupied ? GRID_HIGHLIGHT_OCCUPIED : GRID_HIGHLIGHT_FREE;
-    highlightMaterial.diffuseColor = color;
-    highlightMaterial.emissiveColor = color;
+    highlightMaterial.diffuseColor.copyFrom(color);
+    highlightMaterial.emissiveColor.copyFrom(color);
   };
 
   const handlePointer = (info: PointerInfo) => {

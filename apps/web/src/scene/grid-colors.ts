@@ -1,3 +1,4 @@
+// Constantes immuables : utiliser `.copyFrom()` cote consommateur, ne jamais muter en place.
 import { Color3 } from '@babylonjs/core';
 
 export const GRID_HIGHLIGHT_FREE = new Color3(0.95, 0.97, 1);

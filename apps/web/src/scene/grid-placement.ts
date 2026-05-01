@@ -7,6 +7,7 @@ import {
   type PointerInfo,
   type Scene,
   StandardMaterial,
+  Vector3,
 } from '@babylonjs/core';
 import {
   CELL_SIZE,
@@ -28,18 +29,19 @@ export function createGridPlacement(
   gridState: GridState,
 ): GridPlacement {
   const sharedMaterial = new StandardMaterial('placed-cube-material', scene);
-  sharedMaterial.diffuseColor = PLACED_CUBE_COLOR;
+  sharedMaterial.diffuseColor.copyFrom(PLACED_CUBE_COLOR);
   sharedMaterial.specularColor = new Color3(0.05, 0.05, 0.05);
 
   const placedMeshes: Mesh[] = [];
   const cellBuffer: GridCell = { x: 0, z: 0 };
+  const positionBuffer = new Vector3();
 
   const handlePointer = (info: PointerInfo) => {
     if (info.type !== PointerEventTypes.POINTERTAP) return;
     if (info.event.button !== 0) return;
 
-    const pick = scene.pick(scene.pointerX, scene.pointerY, (mesh) => mesh === ground, true);
-    if (!pick?.hit || !pick.pickedPoint) return;
+    const pick = scene.pick(scene.pointerX, scene.pointerY);
+    if (!pick?.hit || !pick.pickedPoint || pick.pickedMesh !== ground) return;
 
     worldToCell(pick.pickedPoint, cellBuffer);
     if (!isCellInBounds(cellBuffer)) return;
@@ -51,8 +53,8 @@ export function createGridPlacement(
       { size: CELL_SIZE },
       scene,
     );
-    const position = cellToWorld(cell);
-    cube.position.set(position.x, CELL_SIZE / 2, position.z);
+    cellToWorld(cell, positionBuffer);
+    cube.position.set(positionBuffer.x, CELL_SIZE / 2, positionBuffer.z);
     cube.material = sharedMaterial;
 
     gridState.markOccupied(cell);
