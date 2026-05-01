@@ -35,24 +35,24 @@ export function createGrassField(
   const matrices: number[] = [];
   let count = 0;
 
+  const scaleVec = new Vector3();
+  const positionVec = new Vector3();
+  const rotationQuat = new Quaternion();
+  const matrix = new Matrix();
+
   for (let x = -FIELD_HALF; x <= FIELD_HALF; x += GRID_STEP) {
     for (let z = -FIELD_HALF; z <= FIELD_HALF; z += GRID_STEP) {
       const jitterX = (rand() - 0.5) * GRID_STEP * 0.95;
       const jitterZ = (rand() - 0.5) * GRID_STEP * 0.95;
-      const px = x + jitterX;
-      const pz = z + jitterZ;
-
       const yaw = rand() * Math.PI * 2;
       const tiltX = (rand() - 0.5) * TILT_RANGE;
       const tiltZ = (rand() - 0.5) * TILT_RANGE;
       const scale = SCALE_MIN + rand() * (SCALE_MAX - SCALE_MIN);
 
-      const rotation = Quaternion.RotationYawPitchRoll(yaw, tiltX, tiltZ);
-      const matrix = Matrix.Compose(
-        new Vector3(scale, scale, scale),
-        rotation,
-        new Vector3(px, 0, pz),
-      );
+      scaleVec.set(scale, scale, scale);
+      positionVec.set(x + jitterX, 0, z + jitterZ);
+      Quaternion.RotationYawPitchRollToRef(yaw, tiltX, tiltZ, rotationQuat);
+      Matrix.ComposeToRef(scaleVec, rotationQuat, positionVec, matrix);
       matrix.copyToArray(matrices, count * 16);
       count++;
     }
