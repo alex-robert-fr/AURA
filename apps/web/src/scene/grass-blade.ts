@@ -96,6 +96,5 @@ export function createGrassClump(scene: Scene): Mesh {
   data.uvs = uvs;
   data.applyToMesh(mesh);
 
-  mesh.alwaysSelectAsActiveMesh = true;
   return mesh;
 }
