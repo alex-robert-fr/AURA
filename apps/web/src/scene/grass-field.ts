@@ -2,12 +2,15 @@ import { Matrix, Quaternion, type Scene, Vector3 } from '@babylonjs/core';
 import { createGrassClump } from './grass-blade';
 import { createGrassBladeMaterial } from './grass-blade-material';
 import type { GrassPalette } from './grass-palette';
+import { type GridCell, cellKey, worldToCell } from './grid';
 
 const FIELD_HALF = 20;
 const GRID_STEP = 0.18;
 const SCALE_MIN = 0.7;
 const SCALE_MAX = 1.4;
 const TILT_RANGE = 0.18;
+const MATRIX_STRIDE = 16;
+const SCALE_OFFSETS = [0, 5, 10] as const;
 
 const seededRandom = (seed: number): (() => number) => {
   let s = seed >>> 0;
@@ -18,6 +21,7 @@ const seededRandom = (seed: number): (() => number) => {
 };
 
 export interface GrassField {
+  hideClumpsInCell: (cell: GridCell) => void;
   dispose: () => void;
 }
 
@@ -32,6 +36,8 @@ export function createGrassField(
 
   const rand = seededRandom(0xb27c);
   const matrices: number[] = [];
+  const cellIndex = new Map<string, number[]>();
+  const positionCellBuffer: GridCell = { x: 0, z: 0 };
   let count = 0;
 
   const scaleVec = new Vector3();
@@ -52,15 +58,33 @@ export function createGrassField(
       positionVec.set(x + jitterX, 0, z + jitterZ);
       Quaternion.RotationYawPitchRollToRef(yaw, tiltX, tiltZ, rotationQuat);
       Matrix.ComposeToRef(scaleVec, rotationQuat, positionVec, matrix);
-      matrix.copyToArray(matrices, count * 16);
+      matrix.copyToArray(matrices, count * MATRIX_STRIDE);
+
+      worldToCell(positionVec, positionCellBuffer);
+      const key = cellKey(positionCellBuffer);
+      const existing = cellIndex.get(key);
+      if (existing) existing.push(count);
+      else cellIndex.set(key, [count]);
+
       count++;
     }
   }
 
   const buffer = new Float32Array(matrices);
-  clump.thinInstanceSetBuffer('matrix', buffer, 16, true);
+  clump.thinInstanceSetBuffer('matrix', buffer, MATRIX_STRIDE, false);
+
+  const hideClumpsInCell = (cell: GridCell) => {
+    const indices = cellIndex.get(cellKey(cell));
+    if (!indices) return;
+    for (const index of indices) {
+      const offset = index * MATRIX_STRIDE;
+      for (const diagonal of SCALE_OFFSETS) buffer[offset + diagonal] = 0;
+    }
+    clump.thinInstanceBufferUpdated('matrix');
+  };
 
   return {
+    hideClumpsInCell,
     dispose: () => {
       clump.thinInstanceCount = 0;
       clumpMaterial.dispose();

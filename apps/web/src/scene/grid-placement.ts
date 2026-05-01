@@ -23,10 +23,15 @@ export interface GridPlacement {
   dispose: () => void;
 }
 
+export interface GridPlacementOptions {
+  onPlace?: (cell: GridCell) => void;
+}
+
 export function createGridPlacement(
   scene: Scene,
   ground: Mesh,
   gridState: GridState,
+  options: GridPlacementOptions = {},
 ): GridPlacement {
   const sharedMaterial = new StandardMaterial('placed-cube-material', scene);
   sharedMaterial.diffuseColor.copyFrom(PLACED_CUBE_COLOR);
@@ -59,6 +64,7 @@ export function createGridPlacement(
 
     gridState.markOccupied(cell);
     placedMeshes.push(cube);
+    options.onPlace?.(cell);
   };
 
   const observer: Observer<PointerInfo> | null = scene.onPointerObservable.add(handlePointer);

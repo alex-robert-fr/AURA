@@ -53,7 +53,9 @@ export function createCityScene(canvas: HTMLCanvasElement): () => void {
   const grassField = createGrassField(scene, defaultGrassPalette, SUN_DIRECTION);
   const gridState = createGridState();
   const gridOverlay = createGridOverlay(scene, dirtGround.mesh, gridState);
-  const gridPlacement = createGridPlacement(scene, dirtGround.mesh, gridState);
+  const gridPlacement = createGridPlacement(scene, dirtGround.mesh, gridState, {
+    onPlace: (cell) => grassField.hideClumpsInCell(cell),
+  });
 
   const pipeline = createGrassPipeline(scene, camera);
 
