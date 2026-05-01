@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Optimisations de rendu idle : backface culling avec bifaces géométriques (-50 % fill rate), frustum culling restauré (retrait de `alwaysSelectAsActiveMesh`), throttle de l'uniform `time` à 30 Hz, DOF auto-désactivé après 1 s d'inactivité caméra, buffers `Vector3`/`Quaternion`/`Matrix` pré-alloués dans la boucle d'init ([#2](https://github.com/alex-robert-fr/AURA/pull/2))
 - Retrait de la logique de transition d'ère de la scène 3D : module `grass-era-transition.ts` supprimé, palette statique `defaultGrassPalette`, setters dynamiques retirés ([#2](https://github.com/alex-robert-fr/AURA/pull/2))
 - Garde d'enregistrement shader corrigée : vérification dans `Effect.ShadersStore` au lieu d'un flag de module local, robuste aux hot-reloads Vite ([#2](https://github.com/alex-robert-fr/AURA/pull/2))
+- Grille logique pure dans `grid.ts` séparée du rendu `grid-overlay.ts` ; `fastCheck` activé sur `scene.pick`, `renderingGroupId = 1` pour rendre par-dessus l'herbe, surface d'API réduite au strict nécessaire ([#5](https://github.com/alex-robert-fr/AURA/pull/5))
 
 ### Chore
 

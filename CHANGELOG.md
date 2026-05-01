@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Remplace le sol plat par un champ d'herbe 3D dense couvrant tout le plateau : ~350 000 brins individuels animés par une brise avec brillance spéculaire sur les pointes et profondeur de champ légère en arrière-plan ([#2](https://github.com/alex-robert-fr/AURA/pull/2))
 - Ajoute un overlay de débogage affichant le nombre d'images par seconde et le temps de rendu lissé en millisecondes ([#2](https://github.com/alex-robert-fr/AURA/pull/2))
+- Ajoute une grille interactive sur le terrain : les lignes et la case survolée s'affichent au mouvement de la souris et disparaissent quand le curseur quitte le terrain ([#5](https://github.com/alex-robert-fr/AURA/pull/5))
 
 ### Changed
 
