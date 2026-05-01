@@ -27,7 +27,7 @@ void main(void) {
   vec4 worldPos = finalWorld * vec4(position, 1.0);
 
   float windInfluence = uv.y * uv.y;
-  float phase = worldPos.x * 0.45 + worldPos.z * 0.35;
+  float phase = worldPos.x * 0.22 + worldPos.z * 0.18;
   float wave = sin(time * 1.1 + phase) * 0.7 + sin(time * 2.3 + phase * 1.7) * 0.3;
   worldPos.x += wave * 0.09 * windInfluence;
   worldPos.z += wave * 0.05 * windInfluence;
