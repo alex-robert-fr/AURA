@@ -14,7 +14,7 @@ import { GRID_HIGHLIGHT_FREE, GRID_HIGHLIGHT_OCCUPIED } from './grid-colors';
 import { createGridPicker } from './grid-pick';
 
 export const GRID_Y = 0.9;
-const HIGHLIGHT_Y = 0.92;
+const HIGHLIGHT_Y = GRID_Y + 0.001;
 const GRID_COLOR = new Color3(0.85, 0.88, 0.95);
 const GRID_ALPHA = 0.35;
 const HIGHLIGHT_ALPHA = 0.4;
