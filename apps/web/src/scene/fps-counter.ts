@@ -1,6 +1,7 @@
 import type { Engine, Scene } from '@babylonjs/core';
 
 const REFRESH_MS = 500;
+const SMOOTH_ALPHA = 0.06;
 
 export function attachFpsCounter(scene: Scene, engine: Engine): () => void {
   const el = document.createElement('div');
@@ -16,16 +17,20 @@ export function attachFpsCounter(scene: Scene, engine: Engine): () => void {
     'border-radius:4px',
     'pointer-events:none',
     'z-index:1000',
+    'white-space:pre',
   ].join(';');
-  el.textContent = '-- fps';
+  el.textContent = '-- fps · -- ms';
   document.body.appendChild(el);
 
+  let smoothedMs = 16;
   let last = 0;
+
   const observer = scene.onAfterRenderObservable.add(() => {
+    smoothedMs = smoothedMs * (1 - SMOOTH_ALPHA) + engine.getDeltaTime() * SMOOTH_ALPHA;
     const now = performance.now();
     if (now - last < REFRESH_MS) return;
     last = now;
-    el.textContent = `${engine.getFps().toFixed(0)} fps`;
+    el.textContent = `${engine.getFps().toFixed(0)} fps · ${smoothedMs.toFixed(1)} ms`;
   });
 
   return () => {
