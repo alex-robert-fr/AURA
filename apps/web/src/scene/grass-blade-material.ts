@@ -84,8 +84,6 @@ function registerShaders(): void {
 
 export interface GrassBladeMaterial {
   material: ShaderMaterial;
-  setPalette: (palette: GrassPalette) => void;
-  setLightDirection: (dir: Vector3) => void;
   dispose: () => void;
 }
 
@@ -115,21 +113,13 @@ export function createGrassBladeMaterial(
   );
 
   material.backFaceCulling = true;
-
-  const setPalette = (p: GrassPalette): void => {
-    material.setColor3('baseColor', p.base);
-    material.setColor3('tipColor', p.tip);
-    material.setColor3('lightColor', p.sun);
-  };
+  material.setColor3('baseColor', palette.base);
+  material.setColor3('tipColor', palette.tip);
+  material.setColor3('lightColor', palette.sun);
 
   const lightDirNorm = new Vector3();
-  const setLightDirection = (dir: Vector3): void => {
-    dir.normalizeToRef(lightDirNorm);
-    material.setVector3('lightDir', lightDirNorm);
-  };
-
-  setPalette(palette);
-  setLightDirection(lightDirection);
+  lightDirection.normalizeToRef(lightDirNorm);
+  material.setVector3('lightDir', lightDirNorm);
 
   const startedAt = performance.now();
   const WIND_INTERVAL_MS = 33;
@@ -144,8 +134,6 @@ export function createGrassBladeMaterial(
 
   return {
     material,
-    setPalette,
-    setLightDirection,
     dispose: () => {
       if (tickObserver) scene.onBeforeRenderObservable.remove(tickObserver);
       material.dispose(true, true);

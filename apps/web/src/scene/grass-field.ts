@@ -18,7 +18,6 @@ const seededRandom = (seed: number): (() => number) => {
 };
 
 export interface GrassField {
-  setPalette: (palette: GrassPalette) => void;
   dispose: () => void;
 }
 
@@ -62,7 +61,6 @@ export function createGrassField(
   clump.thinInstanceSetBuffer('matrix', buffer, 16, true);
 
   return {
-    setPalette: (p) => clumpMaterial.setPalette(p),
     dispose: () => {
       clump.thinInstanceCount = 0;
       clumpMaterial.dispose();

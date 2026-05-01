@@ -3,7 +3,6 @@ import type { GrassPalette } from './grass-palette';
 
 export interface DirtGround {
   mesh: Mesh;
-  setPalette: (palette: GrassPalette) => void;
   dispose: () => void;
 }
 
@@ -18,9 +17,6 @@ export function createDirtGround(scene: Scene, palette: GrassPalette): DirtGroun
 
   return {
     mesh,
-    setPalette: (p) => {
-      material.diffuseColor = p.ground.clone();
-    },
     dispose: () => {
       material.dispose();
       mesh.dispose();
