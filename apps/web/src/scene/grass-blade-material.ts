@@ -1,4 +1,4 @@
-import { Effect, type Scene, ShaderMaterial, type Vector3 } from '@babylonjs/core';
+import { Effect, type Scene, ShaderMaterial, Vector3 } from '@babylonjs/core';
 import type { GrassPalette } from './grass-palette';
 
 const SHADER_NAME = 'auraGrassBlade';
@@ -122,8 +122,10 @@ export function createGrassBladeMaterial(
     material.setColor3('lightColor', p.sun);
   };
 
+  const lightDirNorm = new Vector3();
   const setLightDirection = (dir: Vector3): void => {
-    material.setVector3('lightDir', dir.normalizeToNew());
+    dir.normalizeToRef(lightDirNorm);
+    material.setVector3('lightDir', lightDirNorm);
   };
 
   setPalette(palette);
