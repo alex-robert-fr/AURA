@@ -1,7 +1,6 @@
 import {
   Color3,
   Constants,
-  type Mesh,
   MeshBuilder,
   type Observer,
   PointerEventTypes,
@@ -10,18 +9,11 @@ import {
   StandardMaterial,
   Vector3,
 } from '@babylonjs/core';
-import {
-  CELL_SIZE,
-  GRID_HALF_EXTENT,
-  type GridCell,
-  type GridState,
-  cellToWorld,
-  isCellInBounds,
-  worldToCell,
-} from './grid';
+import { CELL_SIZE, GRID_HALF_EXTENT, type GridCell, type GridState, cellToWorld } from './grid';
 import { GRID_HIGHLIGHT_FREE, GRID_HIGHLIGHT_OCCUPIED } from './grid-colors';
+import { createGridPicker } from './grid-pick';
 
-const GRID_Y = 0.9;
+export const GRID_Y = 0.9;
 const HIGHLIGHT_Y = 0.92;
 const GRID_COLOR = new Color3(0.85, 0.88, 0.95);
 const GRID_ALPHA = 0.35;
@@ -31,7 +23,7 @@ export interface GridOverlay {
   dispose: () => void;
 }
 
-export function createGridOverlay(scene: Scene, ground: Mesh, gridState: GridState): GridOverlay {
+export function createGridOverlay(scene: Scene, gridState: GridState): GridOverlay {
   const lines: Vector3[][] = [];
   for (let i = -GRID_HALF_EXTENT; i <= GRID_HALF_EXTENT; i += CELL_SIZE) {
     lines.push([
@@ -73,6 +65,7 @@ export function createGridOverlay(scene: Scene, ground: Mesh, gridState: GridSta
   highlightMaterial.depthFunction = Constants.ALWAYS;
   highlightMesh.material = highlightMaterial;
 
+  const picker = createGridPicker(scene, GRID_Y);
   const cellBuffer: GridCell = { x: 0, z: 0 };
   const positionBuffer = new Vector3();
   let currentOccupied = false;
@@ -91,22 +84,15 @@ export function createGridOverlay(scene: Scene, ground: Mesh, gridState: GridSta
   };
 
   const handlePointer = (info: PointerInfo) => {
-    if (info.type === PointerEventTypes.POINTERMOVE) {
-      const pick = scene.pick(scene.pointerX, scene.pointerY, (mesh) => mesh === ground, true);
-      if (!pick?.hit || !pick.pickedPoint) {
-        setVisibility(false);
-        return;
-      }
-      worldToCell(pick.pickedPoint, cellBuffer);
-      if (!isCellInBounds(cellBuffer)) {
-        setVisibility(false);
-        return;
-      }
-      cellToWorld(cellBuffer, positionBuffer);
-      highlightMesh.position.set(positionBuffer.x, HIGHLIGHT_Y, positionBuffer.z);
-      setOccupiedState(gridState.isOccupied(cellBuffer));
-      setVisibility(true);
+    if (info.type !== PointerEventTypes.POINTERMOVE) return;
+    if (!picker.pickCell(cellBuffer)) {
+      setVisibility(false);
+      return;
     }
+    cellToWorld(cellBuffer, positionBuffer);
+    highlightMesh.position.set(positionBuffer.x, HIGHLIGHT_Y, positionBuffer.z);
+    setOccupiedState(gridState.isOccupied(cellBuffer));
+    setVisibility(true);
   };
 
   const observer: Observer<PointerInfo> | null = scene.onPointerObservable.add(handlePointer);

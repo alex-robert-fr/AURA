@@ -52,8 +52,8 @@ export function createCityScene(canvas: HTMLCanvasElement): () => void {
   const dirtGround = createDirtGround(scene, defaultGrassPalette);
   const grassField = createGrassField(scene, defaultGrassPalette, SUN_DIRECTION);
   const gridState = createGridState();
-  const gridOverlay = createGridOverlay(scene, dirtGround.mesh, gridState);
-  const gridPlacement = createGridPlacement(scene, dirtGround.mesh, gridState, {
+  const gridOverlay = createGridOverlay(scene, gridState);
+  const gridPlacement = createGridPlacement(scene, gridState, {
     onPlace: (cell) => grassField.hideClumpsInCell(cell),
   });
 

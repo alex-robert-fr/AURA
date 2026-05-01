@@ -9,27 +9,21 @@ import {
   StandardMaterial,
   Vector3,
 } from '@babylonjs/core';
-import {
-  CELL_SIZE,
-  type GridCell,
-  type GridState,
-  cellToWorld,
-  isCellInBounds,
-  worldToCell,
-} from './grid';
+import { CELL_SIZE, type GridCell, type GridState, cellToWorld } from './grid';
 import { PLACED_CUBE_COLOR } from './grid-colors';
-
-export interface GridPlacement {
-  dispose: () => void;
-}
+import { GRID_Y } from './grid-overlay';
+import { createGridPicker } from './grid-pick';
 
 export interface GridPlacementOptions {
   onPlace?: (cell: GridCell) => void;
 }
 
+export interface GridPlacement {
+  dispose: () => void;
+}
+
 export function createGridPlacement(
   scene: Scene,
-  ground: Mesh,
   gridState: GridState,
   options: GridPlacementOptions = {},
 ): GridPlacement {
@@ -38,18 +32,14 @@ export function createGridPlacement(
   sharedMaterial.specularColor = new Color3(0.05, 0.05, 0.05);
 
   const placedMeshes: Mesh[] = [];
+  const picker = createGridPicker(scene, GRID_Y);
   const cellBuffer: GridCell = { x: 0, z: 0 };
   const positionBuffer = new Vector3();
 
   const handlePointer = (info: PointerInfo) => {
     if (info.type !== PointerEventTypes.POINTERTAP) return;
     if (info.event.button !== 0) return;
-
-    const pick = scene.pick(scene.pointerX, scene.pointerY);
-    if (!pick?.hit || !pick.pickedPoint || pick.pickedMesh !== ground) return;
-
-    worldToCell(pick.pickedPoint, cellBuffer);
-    if (!isCellInBounds(cellBuffer)) return;
+    if (!picker.pickCell(cellBuffer)) return;
     if (gridState.isOccupied(cellBuffer)) return;
 
     const cell: GridCell = { x: cellBuffer.x, z: cellBuffer.z };
