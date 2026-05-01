@@ -21,8 +21,8 @@ import {
 } from './grid';
 import { GRID_HIGHLIGHT_FREE, GRID_HIGHLIGHT_OCCUPIED } from './grid-colors';
 
-const GRID_Y = 0.002;
-const HIGHLIGHT_Y = 0.003;
+const GRID_Y = 0.9;
+const HIGHLIGHT_Y = 0.92;
 const GRID_COLOR = new Color3(0.85, 0.88, 0.95);
 const GRID_ALPHA = 0.35;
 const HIGHLIGHT_ALPHA = 0.4;
@@ -49,7 +49,6 @@ export function createGridOverlay(scene: Scene, ground: Mesh, gridState: GridSta
   gridMesh.alpha = GRID_ALPHA;
   gridMesh.isPickable = false;
   gridMesh.isVisible = false;
-  gridMesh.renderingGroupId = 1;
   if (gridMesh.material) {
     gridMesh.material.disableDepthWrite = true;
     gridMesh.material.depthFunction = Constants.ALWAYS;
@@ -63,7 +62,6 @@ export function createGridOverlay(scene: Scene, ground: Mesh, gridState: GridSta
   highlightMesh.rotation.x = Math.PI / 2;
   highlightMesh.isPickable = false;
   highlightMesh.isVisible = false;
-  highlightMesh.renderingGroupId = 1;
 
   const highlightMaterial = new StandardMaterial('grid-highlight-material', scene);
   highlightMaterial.diffuseColor.copyFrom(GRID_HIGHLIGHT_FREE);
