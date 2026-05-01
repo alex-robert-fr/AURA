@@ -1,12 +1,18 @@
 import {
-  type Camera,
+  type ArcRotateCamera,
   DefaultRenderingPipeline,
   DepthOfFieldEffectBlurLevel,
   ImageProcessingConfiguration,
   type Scene,
 } from '@babylonjs/core';
 
-export function createGrassPipeline(scene: Scene, camera: Camera): DefaultRenderingPipeline {
+const IDLE_DELAY_MS = 1000;
+
+export interface GrassPostprocess {
+  dispose: () => void;
+}
+
+export function createGrassPipeline(scene: Scene, camera: ArcRotateCamera): GrassPostprocess {
   const pipeline = new DefaultRenderingPipeline('grass-pipeline', true, scene, [camera]);
 
   pipeline.depthOfFieldEnabled = true;
@@ -24,5 +30,38 @@ export function createGrassPipeline(scene: Scene, camera: Camera): DefaultRender
 
   pipeline.fxaaEnabled = true;
 
-  return pipeline;
+  let lastAlpha = camera.alpha;
+  let lastBeta = camera.beta;
+  let lastRadius = camera.radius;
+  let lastChangeAt = performance.now();
+  let dofActive = true;
+
+  const observer = scene.onBeforeRenderObservable.add(() => {
+    const moved =
+      camera.alpha !== lastAlpha || camera.beta !== lastBeta || camera.radius !== lastRadius;
+
+    if (moved) {
+      lastAlpha = camera.alpha;
+      lastBeta = camera.beta;
+      lastRadius = camera.radius;
+      lastChangeAt = performance.now();
+      if (!dofActive) {
+        pipeline.depthOfFieldEnabled = true;
+        dofActive = true;
+      }
+      return;
+    }
+
+    if (dofActive && performance.now() - lastChangeAt > IDLE_DELAY_MS) {
+      pipeline.depthOfFieldEnabled = false;
+      dofActive = false;
+    }
+  });
+
+  return {
+    dispose: () => {
+      scene.onBeforeRenderObservable.remove(observer);
+      pipeline.dispose();
+    },
+  };
 }
