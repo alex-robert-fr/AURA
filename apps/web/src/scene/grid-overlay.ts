@@ -49,6 +49,7 @@ export function createGridOverlay(scene: Scene, ground: Mesh, gridState: GridSta
   gridMesh.alpha = GRID_ALPHA;
   gridMesh.isPickable = false;
   gridMesh.isVisible = false;
+  gridMesh.renderingGroupId = 1;
   if (gridMesh.material) {
     gridMesh.material.disableDepthWrite = true;
     gridMesh.material.depthFunction = Constants.ALWAYS;
@@ -62,6 +63,7 @@ export function createGridOverlay(scene: Scene, ground: Mesh, gridState: GridSta
   highlightMesh.rotation.x = Math.PI / 2;
   highlightMesh.isPickable = false;
   highlightMesh.isVisible = false;
+  highlightMesh.renderingGroupId = 1;
 
   const highlightMaterial = new StandardMaterial('grid-highlight-material', scene);
   highlightMaterial.diffuseColor.copyFrom(GRID_HIGHLIGHT_FREE);
