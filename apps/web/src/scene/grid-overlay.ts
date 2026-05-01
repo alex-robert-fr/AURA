@@ -52,6 +52,7 @@ export function createGridOverlay(scene: Scene, ground: Mesh): GridOverlay {
   gridMesh.alpha = GRID_ALPHA;
   gridMesh.isPickable = false;
   gridMesh.isVisible = false;
+  gridMesh.renderingGroupId = 1;
 
   const highlightMesh = MeshBuilder.CreatePlane(
     'grid-highlight',
@@ -61,6 +62,7 @@ export function createGridOverlay(scene: Scene, ground: Mesh): GridOverlay {
   highlightMesh.rotation.x = Math.PI / 2;
   highlightMesh.isPickable = false;
   highlightMesh.isVisible = false;
+  highlightMesh.renderingGroupId = 1;
 
   const highlightMaterial = new StandardMaterial('grid-highlight-material', scene);
   highlightMaterial.diffuseColor = HIGHLIGHT_COLOR;
