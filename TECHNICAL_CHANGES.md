@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Refactor
+
+- Système de champ d'herbe modulaire en ThinInstances : `grass-blade` (géométrie simple plane biface, touffes 7 brins), `grass-blade-material` (shader GLSL gradient + lambert + rétro-éclairage + vent), `grass-field` (50k touffes step 0.18, grille jitterée sur 40×40), `dirt-ground` (sol 40×40), `grass-postprocess` (pipeline DOF+FXAA+ACES), `grass-palette` (palette statique) ([#2](https://github.com/alex-robert-fr/AURA/pull/2))
+- Optimisations de rendu idle : backface culling avec bifaces géométriques (-50 % fill rate), frustum culling restauré (retrait de `alwaysSelectAsActiveMesh`), throttle de l'uniform `time` à 30 Hz, DOF auto-désactivé après 1 s d'inactivité caméra, buffers `Vector3`/`Quaternion`/`Matrix` pré-alloués dans la boucle d'init ([#2](https://github.com/alex-robert-fr/AURA/pull/2))
+- Retrait de la logique de transition d'ère de la scène 3D : module `grass-era-transition.ts` supprimé, palette statique `defaultGrassPalette`, setters dynamiques retirés ([#2](https://github.com/alex-robert-fr/AURA/pull/2))
+- Garde d'enregistrement shader corrigée : vérification dans `Effect.ShadersStore` au lieu d'un flag de module local, robuste aux hot-reloads Vite ([#2](https://github.com/alex-robert-fr/AURA/pull/2))
+
+### Chore
+
+- Overlay DOM FPS et temps de frame lissé (EMA α=0.06, refresh 2 Hz) pour profiler le rendu en développement ([#2](https://github.com/alex-robert-fr/AURA/pull/2))
+
+### Dependencies
+
+- Ajout de `@babylonjs/materials ^7.36.0` dans `apps/web` ([#2](https://github.com/alex-robert-fr/AURA/pull/2))
+
 ## [0.0.1] - 2026-04-30
 
 ### CI
