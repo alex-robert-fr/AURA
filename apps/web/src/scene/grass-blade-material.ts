@@ -132,9 +132,14 @@ export function createGrassBladeMaterial(
   setLightDirection(lightDirection);
 
   const startedAt = performance.now();
+  const WIND_INTERVAL_MS = 33;
+  let lastTick = 0;
   material.setFloat('time', 0);
   const tickObserver = scene.onBeforeRenderObservable.add(() => {
-    material.setFloat('time', (performance.now() - startedAt) * 0.001);
+    const now = performance.now();
+    if (now - lastTick < WIND_INTERVAL_MS) return;
+    lastTick = now;
+    material.setFloat('time', (now - startedAt) * 0.001);
   });
 
   return {
